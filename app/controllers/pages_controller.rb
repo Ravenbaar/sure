@@ -20,7 +20,8 @@ class PagesController < ApplicationController
     "cashflow_donut"     => { col_span: "single", grow: false, min_height: 0 },
     "investment_summary" => { col_span: "single", grow: false, min_height: 0, width_toggle: true },
     "net_worth_chart"    => { col_span: "single", grow: true,  min_height: 208, width_toggle: true },
-    "balance_sheet"      => { col_span: "single", grow: false, min_height: 0, width_toggle: true }
+    "balance_sheet"      => { col_span: "single", grow: false, min_height: 0, width_toggle: true },
+    "subscriptions"      => { col_span: "single", grow: false, min_height: 0, width_toggle: true }
   }.freeze
 
   # Number of consecutive months (ending at the selected month) shown as
@@ -245,6 +246,18 @@ class PagesController < ApplicationController
             },
             # Stays visible with no data so the month picker can lead back out.
             visible: @accounts.any?,
+            collapsible: true
+          }
+        },
+        "subscriptions" => -> {
+          subscriptions_data = build_subscriptions_data
+          {
+            key: "subscriptions",
+            title: "pages.dashboard.subscriptions.title",
+            partial: "pages/dashboard/subscriptions",
+            layout: section_layout("subscriptions"),
+            locals: { subscriptions_data: subscriptions_data },
+            visible: subscriptions_data.present?,
             collapsible: true
           }
         },
@@ -570,6 +583,55 @@ class PagesController < ApplicationController
           end
         end
       end
+    end
+
+    # Monthly cost of every active subscription in the family currency, plus
+    # the renewals landing in the next 30 days. Hidden entirely when the
+    # Bills feature is off or the family has no subscriptions, so the widget
+    # never queries the recurring pipeline for families that don't use it.
+    def build_subscriptions_data
+      return nil if Current.family.nil? || Current.family.recurring_transactions_disabled?
+
+      subscriptions = Current.family.recurring_transactions.active.typed_subscription
+      return nil if subscriptions.empty?
+
+      monthly_total = 0.to_d
+      unconvertible_count = 0
+      subscriptions.find_each do |series|
+        monthly = series.monthly_equivalent_amount
+        next if monthly.zero?
+
+        begin
+          monthly_total += monthly.abs.exchange_to(Current.family.currency).to_d
+        rescue Money::ConversionError
+          unconvertible_count += 1
+        end
+      end
+
+      {
+        monthly_total_money: Money.new(monthly_total, Current.family.currency),
+        active_count: subscriptions.count,
+        unconvertible_count: unconvertible_count,
+        upcoming: upcoming_subscription_renewals(subscriptions)
+      }
+    end
+
+    # The nearest open renewal per subscription, inside the next 30 days (the
+    # occurrence generator's 90-day window covers this). Ordered by the
+    # effective due date so a snoozed renewal keeps its user-chosen place.
+    def upcoming_subscription_renewals(subscriptions)
+      Current.family.recurring_occurrences
+        .open_status
+        .joins(:recurring_transaction)
+        .where(recurring_transactions: { id: subscriptions, destination_account_id: nil })
+        .where("#{RecurringOccurrence::EFFECTIVE_DUE_ON_SQL} BETWEEN ? AND ?", Date.current, Date.current + 30)
+        .includes(recurring_transaction: :merchant)
+        .to_a
+        .group_by(&:recurring_transaction_id)
+        .values
+        .map { |group| group.min_by(&:effective_due_on) }
+        .sort_by(&:effective_due_on)
+        .first(6)
     end
 
     def build_outflows_donut_data(net_totals)

@@ -177,6 +177,17 @@ zh-CN:
         chart_span: 最近 %{count} 个月
         income: 收入
         expenses: 支出
+      subscriptions:
+        title: 订阅
+        monthly_total: 每月合计
+        active_count: "%{count} 个生效订阅"
+        unconvertible_notice: "%{count} 个订阅的币种无法换算为主货币"
+        subscription: 订阅
+        next_renewal: 下次续费
+        amount: 金额
+        due_today: 今天到期
+        due_in_days: "%{count} 天后到期"
+        no_renewals: 未来 30 天没有待续费的订阅
       spending_trend:
         title: 支出趋势
         date_range: "%{start_date} 至 %{end_date}"

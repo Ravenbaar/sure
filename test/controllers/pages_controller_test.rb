@@ -1540,6 +1540,42 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
       Rack::Utils.parse_nested_query(URI.parse(css_select(selector).first["href"]).query)
     end
 
+    test "subscriptions widget renders monthly total and upcoming renewals" do
+      subscription = @family.recurring_transactions.create!(
+        name: "Netflix", account: accounts(:depository), merchant: merchants(:netflix),
+        amount: 15.99, currency: "USD", expected_day_of_month: 5,
+        next_expected_date: 3.days.from_now.to_date, status: "active",
+        bill_type: "subscription", occurrence_count: 1
+      )
+      subscription.recurrence_rules.create!(frequency: "monthly", day_of_month: 5)
+      subscription.recurring_occurrences.create!(
+        family: @family, original_due_on: 3.days.from_now.to_date,
+        due_on: 3.days.from_now.to_date, currency: "USD"
+      )
+
+      get root_path
+
+      assert_response :ok
+      assert_select "#subscriptions"
+      assert_select "#subscriptions table"
+    end
+
+    test "subscriptions widget stays hidden when recurring transactions are disabled" do
+      subscription = @family.recurring_transactions.create!(
+        name: "Netflix", account: accounts(:depository), merchant: merchants(:netflix),
+        amount: 15.99, currency: "USD", expected_day_of_month: 5,
+        next_expected_date: 3.days.from_now.to_date, status: "active",
+        bill_type: "subscription", occurrence_count: 1
+      )
+      subscription.recurrence_rules.create!(frequency: "monthly", day_of_month: 5)
+      @family.update!(recurring_transactions_disabled: true)
+
+      get root_path
+
+      assert_response :ok
+      assert_select "#subscriptions", count: 0
+    end
+
     def spending_trend_category_values
       css_select("#spending-trend-section input[name='spending_category_ids[]']").map { |input| input["value"] }
     end

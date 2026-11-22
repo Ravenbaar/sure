@@ -1,0 +1,65 @@
+<%# locals: (subscriptions_data:, **args) %>
+
+<div id="subscriptions" class="space-y-4">
+  <div class="px-4 space-y-2">
+    <div class="flex items-center gap-2">
+      <h2 class="text-lg font-medium"><%= t(".title") %></h2>
+    </div>
+
+    <p class="text-primary text-3xl font-medium privacy-sensitive">
+      <%= format_money(subscriptions_data[:monthly_total_money]) %>
+    </p>
+
+    <p class="text-xs text-secondary">
+      <%= t(".active_count", count: subscriptions_data[:active_count]) %>
+      <% if subscriptions_data[:unconvertible_count] > 0 %>
+        · <%= t(".unconvertible_notice", count: subscriptions_data[:unconvertible_count]) %>
+      <% end %>
+    </p>
+  </div>
+
+  <% upcoming = subscriptions_data[:upcoming] %>
+  <% if upcoming.any? %>
+    <div class="bg-container-inset rounded-xl p-1 mx-4 overflow-x-auto">
+      <div class="rounded-lg shadow-border-xs bg-container overflow-hidden">
+        <table class="w-full">
+          <thead class="bg-container-inset">
+            <tr class="uppercase text-xs font-medium text-secondary">
+              <th class="px-4 py-2 text-left font-medium"><%= t(".subscription") %></th>
+              <th class="px-4 py-2 text-right font-medium"><%= t(".next_renewal") %></th>
+              <th class="px-4 py-2 text-right font-medium"><%= t(".amount") %></th>
+            </tr>
+          </thead>
+          <tbody class="font-medium text-sm">
+            <% upcoming.each_with_index do |occurrence, idx| %>
+              <% series = occurrence.recurring_transaction %>
+              <tr class="<%= idx < upcoming.size - 1 ? "table-divider" : "" %>">
+                <td class="p-4">
+                  <div class="flex items-center gap-3">
+                    <%= render partial: "bills/series_avatar", locals: { series: series } %>
+                    <div class="max-w-32">
+                      <p class="font-medium truncate"><%= series.display_name %></p>
+                    </div>
+                  </div>
+                </td>
+                <td class="p-4 text-right text-secondary">
+                  <% days = (occurrence.effective_due_on - Date.current).to_i %>
+                  <% if days <= 0 %>
+                    <span class="font-medium text-primary"><%= t(".due_today") %></span>
+                  <% else %>
+                    <%= t(".due_in_days", days: days) %>
+                  <% end %>
+                </td>
+                <td class="p-4 text-right privacy-sensitive">
+                  <%= format_money(occurrence.resolved_expected_amount_money) %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <p class="px-4 pb-4 text-sm text-secondary"><%= t(".no_renewals") %></p>
+  <% end %>
+</div>

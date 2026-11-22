@@ -177,6 +177,23 @@ en:
         chart_span: "Last %{count} months"
         income: "Income"
         expenses: "Expenses"
+      subscriptions:
+        title: "Subscriptions"
+        monthly_total: "Monthly total"
+        active_count:
+          one: "%{count} active subscription"
+          other: "%{count} active subscriptions"
+        unconvertible_notice:
+          one: "%{count} subscription uses a currency that can't be converted to your main currency"
+          other: "%{count} subscriptions use currencies that can't be converted to your main currency"
+        subscription: "Subscription"
+        next_renewal: "Next renewal"
+        amount: "Amount"
+        due_today: "Due today"
+        due_in_days:
+          one: "Due in %{count} day"
+          other: "Due in %{count} days"
+        no_renewals: "No renewals scheduled in the next 30 days"
       spending_trend:
         title: "Spending"
         date_range: "%{start_date} to %{end_date}"

@@ -151,6 +151,32 @@ class RecurringTransactionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 12.5, bill.amount
   end
 
+  test "create keeps the kind picked on the form" do
+    post recurring_transactions_url, params: {
+      recurring_transaction: {
+        name: "Streambox Pro", amount: "12.50",
+        account_id: accounts(:depository).id, first_due_on: (Date.current + 9).iso8601,
+        frequency_preset: "monthly", bill_type: "subscription"
+      }
+    }
+
+    bill = @family.recurring_transactions.find_by!(name: "Streambox Pro")
+    assert_equal "subscription", bill.bill_type
+  end
+
+  test "create falls back to bill when the kind is not an outflow type" do
+    post recurring_transactions_url, params: {
+      recurring_transaction: {
+        name: "Streambox Weird", amount: "12.50",
+        account_id: accounts(:depository).id, first_due_on: (Date.current + 9).iso8601,
+        frequency_preset: "monthly", bill_type: "income"
+      }
+    }
+
+    bill = @family.recurring_transactions.find_by!(name: "Streambox Weird")
+    assert_equal "bill", bill.bill_type
+  end
+
   test "edit renders the form" do
     get edit_recurring_transaction_url(@recurring_transaction)
 

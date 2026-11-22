@@ -404,7 +404,7 @@ class RecurringTransactionsController < ApplicationController
     def new_recurring_transaction_params
       params.require(:recurring_transaction).permit(
         :name, :amount, :currency, :account_id, :first_due_on, :frequency_preset,
-        :frequency_interval, :frequency_interval_unit,
+        :frequency_interval, :frequency_interval_unit, :bill_type,
         :payment_url, :autopay, :notes, :is_income, :category_id
       )
     end

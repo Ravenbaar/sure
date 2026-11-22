@@ -153,7 +153,7 @@
       <% end %>
     </div>
 
-    <% if recurring_transaction.persisted? && %w[bill subscription installment other].include?(recurring_transaction.bill_type) %>
+    <% if (recurring_transaction.persisted? && %w[bill subscription installment other].include?(recurring_transaction.bill_type)) || recurring_transaction.new_record? %>
       <%# One field per row: the category picker opens a menu that holds a
           search field and the whole category list, and half a dialog is too
           narrow for either. %>
@@ -178,16 +178,14 @@
         </div>
       </div>
 
-      <% if recurring_transaction.typed_subscription? %>
-        <div class="space-y-2">
-          <div class="grid grid-cols-3 gap-3">
-            <%= f.date_field :renews_on, label: t(".renews_on_label") %>
-            <%= f.date_field :trial_ends_on, label: t(".trial_ends_on_label") %>
-            <%= f.date_field :cancelled_on, label: t(".cancelled_on_label") %>
-          </div>
-          <p class="text-xs text-secondary"><%= t(".cancelled_on_hint") %></p>
+      <div class="space-y-2 hidden" data-frequency-fields-target="group" data-presets="subscription">
+        <div class="grid grid-cols-3 gap-3">
+          <%= f.date_field :renews_on, label: t(".renews_on_label") %>
+          <%= f.date_field :trial_ends_on, label: t(".trial_ends_on_label") %>
+          <%= f.date_field :cancelled_on, label: t(".cancelled_on_label") %>
         </div>
-      <% end %>
+        <p class="text-xs text-secondary"><%= t(".cancelled_on_hint") %></p>
+      </div>
     <% end %>
 
     <%# Edit shows category beside kind; a new bill has no kind to pick yet,

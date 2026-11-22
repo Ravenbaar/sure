@@ -40,7 +40,7 @@ class RecurringTransaction
       recurring = family.recurring_transactions.new(
         name: attrs[:name],
         amount: amount,
-        bill_type: is_income ? "income" : "bill",
+        bill_type: declared_bill_type(is_income, attrs[:bill_type]),
         # A paycheck is not spend, so it carries no category. Ownership of the
         # id is checked by the model's category_belongs_to_family validation.
         category_id: is_income ? nil : attrs[:category_id].presence,
@@ -157,6 +157,16 @@ class RecurringTransaction
     end
 
     private
+      # The form's kind selector overrides the outflow default, but income
+      # stays income: the sign convention above and the category rules below
+      # depend on it. Outflow kinds are the four the bills pages know; an
+      # unlisted value falls back to bill.
+      def declared_bill_type(is_income, requested)
+        return "income" if is_income
+
+        %w[bill subscription installment other].include?(requested) ? requested : "bill"
+      end
+
       # A currency picked on the form wins, the way a transaction's does: a USD
       # subscription charged to a EUR card is a USD bill. With none, the bill
       # takes its account's currency. A code the app doesn't know is ignored

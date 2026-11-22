@@ -595,21 +595,21 @@ class PagesController < ApplicationController
       subscriptions = Current.family.recurring_transactions.active.typed_subscription
       return nil if subscriptions.empty?
 
-      monthly_total = 0.to_d
+      monthly_total = Money.new(0, Current.family.currency)
       unconvertible_count = 0
       subscriptions.find_each do |series|
         monthly = series.monthly_equivalent_amount
         next if monthly.zero?
 
         begin
-          monthly_total += monthly.abs.exchange_to(Current.family.currency).to_d
+          monthly_total += monthly.abs.exchange_to(Current.family.currency)
         rescue Money::ConversionError
           unconvertible_count += 1
         end
       end
 
       {
-        monthly_total_money: Money.new(monthly_total, Current.family.currency),
+        monthly_total_money: monthly_total,
         active_count: subscriptions.count,
         unconvertible_count: unconvertible_count,
         upcoming: upcoming_subscription_renewals(subscriptions)

@@ -985,6 +985,10 @@ class User < ApplicationRecord
     preferences&.dig("push_budget_warnings_enabled") == true
   end
 
+  def push_subscription_reminders_enabled?
+    preferences&.dig("push_subscription_reminders_enabled") == true
+  end
+
   def preview_features_enabled?
     preferences&.dig("preview_features_enabled") == true
   end

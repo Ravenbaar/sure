@@ -29,6 +29,7 @@ class Insight < ApplicationRecord
     cash_flow_warning
     net_worth_milestone
     subscription_audit
+    subscription_due_reminder
     savings_rate_change
     idle_cash
     budget_at_risk
@@ -114,11 +115,14 @@ class Insight < ApplicationRecord
   }
 
   # The one push policy, read by every channel: high-priority insights, plus
-  # near-limit (medium) budget warnings for users who opt in. Tenancy and
+  # near-limit (medium) budget warnings for users who opt in, plus upcoming
+  # (medium) subscription renewals for users who opt in. Tenancy and
   # shared-account visibility mirror the feed.
   def notifies?(user)
     return false unless active? && user.active? && user.family_id == family_id && user.preview_features_enabled?
-    return false unless priority_high? || (insight_type == "budget_at_risk" && priority_medium? && user.push_budget_warnings_enabled?)
+    return false unless priority_high? ||
+      (insight_type == "budget_at_risk" && priority_medium? && user.push_budget_warnings_enabled?) ||
+      (insight_type == "subscription_due_reminder" && priority_medium? && user.push_subscription_reminders_enabled?)
 
     Insight.about_shared_accounts.exists?(id)
   end

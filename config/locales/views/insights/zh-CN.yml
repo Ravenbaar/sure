@@ -41,6 +41,7 @@ zh-CN:
       cash_flow_warning: 现金流
       net_worth_milestone: 净资产
       subscription_audit: 订阅
+      subscription_due_reminder: 续费
       savings_rate_change: 储蓄率
       idle_cash: 闲置现金
       budget_at_risk: 预算
@@ -71,6 +72,7 @@ zh-CN:
       cash_flow_warning: 查看循环交易
       net_worth_milestone: 查看净资产报告
       subscription_audit: 查看循环交易
+      subscription_due_reminder: 查看订阅
       savings_rate_change: 查看这几个月份的交易
       idle_cash: 前往账户
       budget: 查看预算
@@ -85,6 +87,7 @@ zh-CN:
       net_worth_milestone: "净资产里程碑：%{milestone}"
       maintained_goal_depleted: "%{goal} 已跌破设定水平"
       subscription_audit: "%{name} 仍在订阅中吗？"
+      subscription_due_reminder: "%{name} 将于 %{due_on} 续费"
       savings_rate_change:
         up: 您近三个月的储蓄率有所提高
         down: 您近三个月的储蓄率有所下降
@@ -103,6 +106,7 @@ zh-CN:
       net_worth_milestone: "您的净资产已突破 %{milestone}，目前为 %{net_worth}。"
       maintained_goal_depleted: "%{goal} 目前持有 %{saved}，低于预定目标 %{target}，尚缺 %{missing}。"
       subscription_audit: "%{name}（%{amount}）自预期的 %{expected_on} 后未再出现。可能已被取消，或扣款日期有所变动。"
+      subscription_due_reminder: "%{name}（%{amount}）定于 %{due_on} 续费扣款。"
       savings_rate_change:
         up: "%{from_month}至%{to_month}，按您平常的月收入计算，储蓄率为 %{current_rate}%，比之前三个月的 %{previous_rate}% 提高了 %{change_pp} 个百分点。"
         down: "%{from_month}至%{to_month}，按您平常的月收入计算，储蓄率为 %{current_rate}%，比之前三个月的 %{previous_rate}% 降低了 %{change_pp} 个百分点。"

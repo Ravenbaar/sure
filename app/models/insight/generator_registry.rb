@@ -9,6 +9,7 @@ class Insight::GeneratorRegistry
     Insight::Generators::CashFlowWarningGenerator,
     Insight::Generators::NetWorthMilestoneGenerator,
     Insight::Generators::SubscriptionAuditGenerator,
+    Insight::Generators::SubscriptionDueSoonGenerator,
     Insight::Generators::SavingsRateChangeGenerator,
     Insight::Generators::IdleCashGenerator,
     Insight::Generators::BudgetInsightGenerator,

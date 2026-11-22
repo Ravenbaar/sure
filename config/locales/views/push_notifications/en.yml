@@ -3,4 +3,6 @@ en:
     budget_description: Also notify me when a budget category nears its limit. Over-budget alerts are always sent. Off by default.
     budget_title: Budget warnings
     description: Applies to every device you have enabled, browser and iOS.
+    subscription_description: Notify me a few days before a subscription is scheduled to renew. Off by default.
+    subscription_title: Subscription renewals
     title: Push notifications
